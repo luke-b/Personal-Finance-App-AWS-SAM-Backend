@@ -1,0 +1,34 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "personal-finance-app"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-EXAMPLE"
+s3_prefix = "personal-finance-app"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Stage=\"Dev\""
+image_repositories = []
+
+[default.build]
+[default.build.parameters]
+cached = true
+parallel = true
+
+[prod]
+[prod.deploy]
+[prod.deploy.parameters]
+stack_name = "personal-finance-app-prod"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-EXAMPLE"
+s3_prefix = "personal-finance-app-prod"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Stage=\"Prod\""
+image_repositories = []
+
+[prod.build]
+[prod.build.parameters]
+cached = true
+parallel = true
