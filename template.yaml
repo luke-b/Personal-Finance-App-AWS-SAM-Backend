@@ -1,0 +1,369 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Personal Finance App Backend
+
+Parameters:
+  Stage:
+    Type: String
+    Default: Dev
+    AllowedValues:
+      - Dev
+      - Prod
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs14.x
+    Handler: index.handler
+    Environment:
+      Variables:
+        STAGE: !Ref Stage
+        USER_TABLE: !Ref UserTable
+        ACCOUNT_TABLE: !Ref AccountTable
+        TRANSACTION_TABLE: !Ref TransactionTable
+        BUDGET_TABLE: !Ref BudgetTable
+        GOAL_TABLE: !Ref GoalTable
+        EXPORT_BUCKET: !Ref ExportBucket
+
+Resources:
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref PersonalFinanceApi
+      ProviderARNs:
+        - !GetAtt UserPool.Arn
+
+  PersonalFinanceApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: ApiGatewayAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          ApiGatewayAuthorizer:
+            UserPoolArn: !GetAtt UserPool.Arn
+
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/user/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        GetUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: POST
+            RestApiId: !Ref PersonalFinanceApi
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: PUT
+            RestApiId: !Ref PersonalFinanceApi
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: DELETE
+            RestApiId: !Ref PersonalFinanceApi
+
+  AccountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/account/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AccountTable
+      Events:
+        GetAccounts:
+          Type: Api
+          Properties:
+            Path: /account
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        GetAccount:
+          Type: Api
+          Properties:
+            Path: /account/{id}
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /account
+            Method: POST
+            RestApiId: !Ref PersonalFinanceApi
+        UpdateAccount:
+          Type: Api
+          Properties:
+            Path: /account/{id}
+            Method: PUT
+            RestApiId: !Ref PersonalFinanceApi
+        DeleteAccount:
+          Type: Api
+          Properties:
+            Path: /account/{id}
+            Method: DELETE
+            RestApiId: !Ref PersonalFinanceApi
+
+  TransactionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/transaction/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TransactionTable
+      Events:
+        GetTransactions:
+          Type: Api
+          Properties:
+            Path: /transaction
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        GetTransaction:
+          Type: Api
+          Properties:
+            Path: /transaction/{id}
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        CreateTransaction:
+          Type: Api
+          Properties:
+            Path: /transaction
+            Method: POST
+            RestApiId: !Ref PersonalFinanceApi
+        UpdateTransaction:
+          Type: Api
+          Properties:
+            Path: /transaction/{id}
+            Method: PUT
+            RestApiId: !Ref PersonalFinanceApi
+        DeleteTransaction:
+          Type: Api
+          Properties:
+            Path: /transaction/{id}
+            Method: DELETE
+            RestApiId: !Ref PersonalFinanceApi
+
+  BudgetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/budget/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BudgetTable
+      Events:
+        GetBudgets:
+          Type: Api
+          Properties:
+            Path: /budget
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        GetBudget:
+          Type: Api
+          Properties:
+            Path: /budget/{id}
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        CreateBudget:
+          Type: Api
+          Properties:
+            Path: /budget
+            Method: POST
+            RestApiId: !Ref PersonalFinanceApi
+        UpdateBudget:
+          Type: Api
+          Properties:
+            Path: /budget/{id}
+            Method: PUT
+            RestApiId: !Ref PersonalFinanceApi
+        DeleteBudget:
+          Type: Api
+          Properties:
+            Path: /budget/{id}
+            Method: DELETE
+            RestApiId: !Ref PersonalFinanceApi
+
+  GoalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/goal/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GoalTable
+      Events:
+        GetGoals:
+          Type: Api
+          Properties:
+            Path: /goal
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        GetGoal:
+          Type: Api
+          Properties:
+            Path: /goal/{id}
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+        CreateGoal:
+          Type: Api
+          Properties:
+            Path: /goal
+            Method: POST
+            RestApiId: !Ref PersonalFinanceApi
+        UpdateGoal:
+          Type: Api
+          Properties:
+            Path: /goal/{id}
+            Method: PUT
+            RestApiId: !Ref PersonalFinanceApi
+        DeleteGoal:
+          Type: Api
+          Properties:
+            Path: /goal/{id}
+            Method: DELETE
+            RestApiId: !Ref PersonalFinanceApi
+
+  AnalyticsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/analytics/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TransactionTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref BudgetTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref GoalTable
+      Events:
+        GetAnalytics:
+          Type: Api
+          Properties:
+            Path: /analytics/summary
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+
+  ExportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/export/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref TransactionTable
+        - S3CrudPolicy:
+            BucketName: !Ref ExportBucket
+      Events:
+        ExportApi:
+          Type: Api
+          Properties:
+            Path: /export
+            Method: GET
+            RestApiId: !Ref PersonalFinanceApi
+
+  UserTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey: 
+        Name: UserID
+        Type: String
+      TableName: !Sub ${AWS::StackName}-Users-${Stage}
+
+  AccountTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: AccountID
+        Type: String
+      TableName: !Sub ${AWS::StackName}-Accounts-${Stage}
+
+  TransactionTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: TransactionID
+        Type: String
+      TableName: !Sub ${AWS::StackName}-Transactions-${Stage}
+
+  BudgetTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: BudgetID
+        Type: String
+      TableName: !Sub ${AWS::StackName}-Budgets-${Stage}
+
+  GoalTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: GoalID
+        Type: String
+      TableName: !Sub ${AWS::StackName}-Goals-${Stage}
+
+  ExportBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-exports-${Stage}
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-user-pool-${Stage}
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${AWS::StackName}-user-pool-client-${Stage}
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${PersonalFinanceApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
+
+  UserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref UserPool
+
+  UserPoolClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref UserPoolClient
+
+  ExportBucketName:
+    Description: "S3 Bucket for data exports"
+    Value: !Ref ExportBucket
