@@ -1,0 +1,722 @@
+openapi: 3.0.0
+info:
+  title: Personal Finance App API
+  description: API for managing personal finances, including transactions, budgets, and financial goals.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@personalfinanceapp.com
+
+servers:
+  - url: https://api.personalfinanceapp.com/v1
+
+paths:
+  /users:
+    get:
+      summary: List all users
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:    
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      summary: Get user details
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Update user details
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted successfully
+
+  /accounts:
+    get:
+      summary: List all accounts for the authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+    post:
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAccount'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+
+  /accounts/{accountId}:
+    get:
+      summary: Get account details
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    put:
+      summary: Update account details
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    delete:
+      summary: Delete an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Account deleted successfully
+
+  /transactions:
+    get:
+      summary: List all transactions for the authenticated user
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+    post:
+      summary: Create a new transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTransaction'
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+  /transactions/{transactionId}:
+    get:
+      summary: Get transaction details
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+    put:
+      summary: Update transaction details
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransaction'
+      responses:
+        '200':
+          description: Transaction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+    delete:
+      summary: Delete a transaction
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Transaction deleted successfully
+
+  /budgets:
+    get:
+      summary: List all budgets for the authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Budget'
+    post:
+      summary: Create a new budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBudget'
+      responses:
+        '201':
+          description: Budget created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+
+  /budgets/{budgetId}:
+    get:
+      summary: Get budget details
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+    put:
+      summary: Update budget details
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudget'
+      responses:
+        '200':
+          description: Budget updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+    delete:
+      summary: Delete a budget
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Budget deleted successfully
+
+  /goals:
+    get:
+      summary: List all financial goals for the authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+    post:
+      summary: Create a new financial goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGoal'
+      responses:
+        '201':
+          description: Goal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+
+  /goals/{goalId}:
+    get:
+      summary: Get financial goal details
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+    put:
+      summary: Update financial goal details
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGoal'
+      responses:
+        '200':
+          description: Goal updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+    delete:
+      summary: Delete a financial goal
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Goal deleted successfully
+
+  /analytics/summary:
+    get:
+      summary: Get financial analytics summary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsSummary'
+
+  /export:
+    get:
+      summary: Export user's financial data
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  filename:
+                    type: string
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    NewUser:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UpdateUser:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [checking, savings, credit, investment]
+        balance:
+          type: number
+        currency:
+          type: string
+
+    NewAccount:
+      type: object
+      required:
+        - name
+        - type
+        - balance
+        - currency
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [checking, savings, credit, investment]
+        balance:
+          type: number
+        currency:
+          type: string
+
+    UpdateAccount:
+      type: object
+      properties:
+        name:
+          type: string
+        balance:
+          type: number
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        accountId:
+          type: string
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+
+    NewTransaction:
+      type: object
+      required:
+        - accountId
+        - date
+        - amount
+        - category
+      properties:
+        accountId:
+          type: string
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+
+    UpdateTransaction:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+
+    Budget:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        amount:
+          type: number
+        period:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+
+    NewBudget:
+      type: object
+      required:
+        - category
+        - amount
+        - period
+      properties:
+        category:
+          type: string
+        amount:
+          type: number
+        period:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+
+    UpdateBudget:
+      type: object
+      properties:
+        amount:
+          type: number
+        period:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+
+    Goal:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        targetAmount:
+          type: number
+        currentAmount:
+          type: number
+        deadline:
+          type: string
+          format: date
+
+    NewGoal:
+      type: object
+      required:
+        - name
+        - targetAmount
+        - deadline
+      properties:
+        name:
+          type: string
+        targetAmount:
+          type: number
+        currentAmount:
+          type: number
+        deadline:
+          type: string
+          format: date
+
+    UpdateGoal:
+      type: object
+      properties:
+        name:
+          type: string
+        targetAmount:
+          type: number
+        currentAmount:
+          type: number
+        deadline:
+          type: string
+          format: date
+
+    AnalyticsSummary:
+      type: object
+      properties:
+        incomeVsExpenses:
+          type: object
+          properties:
+            income:
+              type: number
+            expenses:
+              type: number
+            netIncome:
+              type: number
+        budgetProgress:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              limit:
+                type: number
+              spent:
+                type: number
+              remaining:
+                type: number
+              percentUsed:
+                type: number
+        goalProgress:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              target:
+                type: number
+              current:
+                type: number
+              remaining:
+                type: number
+              progress:
+                type: number
+        topCategories:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              total:
+                type: number
+        monthlyTrend:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+              income:
+                type: number
+              expenses:
+                type: number
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
