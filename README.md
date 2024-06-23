@@ -145,6 +145,39 @@ Thank you for using or contributing to the Personal Finance App Backend!
 
 ---
 
+## GitHub Actions workflow does the following:
+
+1. On every push to main and pull request to main, it runs the `build-and-test` job:
+   - Sets up Node.js
+   - Installs dependencies
+   - Runs tests
+
+2. If it's a push to the main branch, it runs the `deploy-dev` job:
+   - Sets up Python and installs SAM CLI
+   - Configures AWS credentials
+   - Builds the SAM application using the `default` config
+   - Deploys to the development environment
+
+3. If the `deploy-dev` job succeeds, it runs the `deploy-prod` job:
+   - Similar to `deploy-dev`, but uses the `prod` config
+   - Deploys to the production environment
+
+To use this workflow:
+
+1. Add the `.github/workflows/sam-pipeline.yml` file to your repository.
+
+2. In your GitHub repository settings, add the following secrets:
+   - `AWS_ACCESS_KEY_ID`: Your AWS access key ID
+   - `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
+
+   Make sure these credentials have the necessary permissions to deploy your SAM application.
+
+3. Optionally, create a `production` environment in your GitHub repository settings if you want to add approval steps or additional protection for production deployments.
+
+This setup provides a continuous integration and deployment pipeline that automatically tests your changes, deploys to a development environment on every push to main, and then deploys to production if the development deployment is successful.
+
+---
+
 # Personal Finance App API Documentation
 
 This document provides detailed information about the API endpoints for the Personal Finance App backend.
