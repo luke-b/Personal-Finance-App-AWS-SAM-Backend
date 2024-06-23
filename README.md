@@ -75,8 +75,8 @@ Data is stored in Amazon DynamoDB, and the API is exposed through Amazon API Gat
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/personal-finance-app-backend.git
-   cd personal-finance-app-backend
+   git clone https://github.com/yourusername/Personal-Finance-App-AWS-SAM-Backend.git
+   cd Personal-Finance-App-AWS-SAM-Backend
    ```
 
 2. Install dependencies:
