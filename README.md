@@ -176,6 +176,51 @@ To use this workflow:
 
 This setup provides a continuous integration and deployment pipeline that automatically tests your changes, deploys to a development environment on every push to main, and then deploys to production if the development deployment is successful.
 
+## Approval requirements for deploying to specific environments
+
+GitHub's environment protection rules allow you to set up approval requirements for deploying to specific environments, like production. Here's how you can set up approval steps for your production deployment:
+
+1. Create a Production Environment:
+   - Go to your GitHub repository
+   - Click on "Settings" > "Environments"
+   - Click "New environment"
+   - Name it "production" (to match the environment name in the GitHub Actions workflow)
+
+2. Configure Protection Rules:
+   - In the environment settings, enable "Required reviewers"
+   - Add one or more people or teams who can approve production deployments
+   - Optionally, you can also set up other protection rules like:
+     - Wait timer (e.g., wait 10 minutes before allowing deployments)
+     - Deployment branches (restrict which branches can deploy to this environment)
+
+3. How It Works in the Workflow:
+   - In our `sam-pipeline.yml`, the `deploy-prod` job has this line:
+     ```yaml
+     environment: production
+     ```
+   - This line associates the job with the "production" environment we just created
+
+4. Deployment Process with Approvals:
+   - When a push to main triggers the workflow, it will run `build-and-test` and `deploy-dev` as before
+   - When it reaches the `deploy-prod` job, it will pause and wait for approval
+   - Designated reviewers will receive a notification
+   - They can go to the GitHub Actions page to review and approve the deployment
+   - Once approved, the production deployment will proceed
+
+5. Approval Interface:
+   - Approvers can see the changes that are about to be deployed
+   - They can leave comments or request changes
+   - They can approve or reject the deployment
+
+To make this process even more robust, you could:
+
+1. Add more detailed environment-specific checks in your `deploy-prod` job.
+2. Use GitHub environments to store environment-specific secrets.
+3. Implement a ChatOps solution to manage approvals via Slack or Microsoft Teams.
+
+Remember, while this adds a layer of protection, it's also important to have proper testing, staging environments, and rollback procedures in place for a comprehensive production deployment strategy.
+
+
 ---
 
 # Personal Finance App API Documentation
