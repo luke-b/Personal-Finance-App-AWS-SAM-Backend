@@ -45,7 +45,7 @@ personal-finance-app/
 
 - User Authentication with Amazon Cognito
 - CRUD operations for users, accounts, transactions, budgets, and financial goals
-- Advanced analytics for financial insights
+- Analytics for financial insights
 - Data export functionality
 - Serverless architecture for scalability and cost-efficiency
 
