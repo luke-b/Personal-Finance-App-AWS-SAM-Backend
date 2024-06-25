@@ -1,48 +1,74 @@
-name: Compile Wolfenstein 3D
+name: SAM Pipeline
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - name: Install dependencies
+        run: npm install
+#     - name: Run tests
+#       run: npm test
 
-    - name: Setup DosBox
-      run: sudo apt-get install dosbox
+  deploy-dev:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install SAM CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install aws-sam-cli
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: SAM build
+        run: sam build --config-env default
+      - name: SAM deploy
+        run: sam deploy --config-env default --no-confirm-changeset --no-fail-on-empty-changeset
 
-    - name: Download and Extract Borland C++
-      run: |
-        mkdir -p ${{github.workspace}}/tools
-        curl -L -o ${{github.workspace}}/tools/borland.zip [Borland_C++_download_link]
-        unzip ${{github.workspace}}/tools/borland.zip -d ${{github.workspace}}/tools/borland
-
-    - name: Prepare Borland C++ Setup Script
-      run: |
-        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox_install.conf
-        echo 'C:' >> ${{github.workspace}}/dosbox_install.conf
-        echo 'cd tools/borland' >> ${{github.workspace}}/dosbox_install.conf
-        echo 'install.exe' >> ${{github.workspace}}/dosbox_install.conf
-
-    - name: Install Borland C++
-      run: dosbox -conf ${{github.workspace}}/dosbox_install.conf
-
-    - name: Prepare Build Script
-      run: |
-        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox_build.conf
-        echo 'C:' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'cd WOLF3D/SRC' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'bcc +WOLF3D.CFG' >> ${{github.workspace}}/dosbox_build.conf
-
-    - name: Compile Wolfenstein 3D
-      run: dosbox -conf ${{github.workspace}}/dosbox_build.conf
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: compiled-game
-        path: |
-          ${{github.workspace}}/WOLF3D/SRC/*.EXE
-          ${{github.workspace}}/WOLF3D/SRC/*.MAP
+  deploy-prod:
+    needs: deploy-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install SAM CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install aws-sam-cli
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: SAM build
+        run: sam build --config-env prod
+      - name: SAM deploy
+        run: sam deploy --config-env prod --no-confirm-changeset --no-fail-on-empty-changeset
