@@ -1,6 +1,6 @@
 const AWSMock = require('aws-sdk-mock');
 const AWS = require('aws-sdk');
-const { handler } = require('./budget'); // Path to your Lambda file
+const { handler } = require('./index'); 
 
 // Set AWS SDK instance to mock
 AWSMock.setSDKInstance(AWS);
