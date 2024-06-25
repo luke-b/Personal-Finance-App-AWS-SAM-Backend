@@ -26,14 +26,22 @@ const AUDIT_TABLE = getEnvVariable('AUDIT_TABLE');
 const EXPORT_BUCKET = getEnvVariable('EXPORT_BUCKET');
 const STAGE = getEnvVariable('STAGE');
 
-// Function to extract user ID from the event (assuming JWT or a similar auth mechanism)
-function getUserId(event) {
-    // Assuming user ID is stored in a custom claim in the event object
-    if (!event.requestContext.authorizer || !event.requestContext.authorizer.claims || !event.requestContext.authorizer.claims.sub) {
-        throw new Error('User ID not found in the event object');
-    }
+/**
+ * Extracts the user ID from the Cognito authorizer context.
+ *
+ * @param {Object} event - The Lambda event object.
+ * @returns {string} The user ID.
+ * @throws {Error} If the user ID is not found in the event.
+ */
+const getUserId = (event) => {
+  if (event.requestContext && 
+      event.requestContext.authorizer && 
+      event.requestContext.authorizer.claims && 
+      event.requestContext.authorizer.claims.sub) {
     return event.requestContext.authorizer.claims.sub;
-}
+  }
+  throw new Error('User ID not found in the event object');
+};
 
 module.exports = {
     generateUUID,
