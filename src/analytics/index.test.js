@@ -1,6 +1,6 @@
 const AWSMock = require('aws-sdk-mock');
 const AWS = require('aws-sdk');
-const { handler } = require('./analytics');  
+const { handler } = require('./index');  
 
 // Setting up the AWS SDK DynamoDB DocumentClient mock
 AWSMock.setSDKInstance(AWS);
