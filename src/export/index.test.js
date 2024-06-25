@@ -1,6 +1,6 @@
 const AWSMock = require('aws-sdk-mock');
 const AWS = require('aws-sdk');
-const { handler } = require('./export'); 
+const { handler } = require('./index'); 
 
 AWSMock.setSDKInstance(AWS);
 
