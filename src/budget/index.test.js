@@ -1,6 +1,6 @@
 const AWSMock = require('aws-sdk-mock');
 const AWS = require('aws-sdk');
-const { handler } = require('./index'); 
+const { handler } = require('./index');
 
 // Set AWS SDK instance to mock
 AWSMock.setSDKInstance(AWS);
@@ -19,7 +19,7 @@ describe('getAllBudgets', () => {
       { BudgetID: '1', Category: 'Housing', Amount: 1200, Period: 'monthly' },
       { BudgetID: '2', Category: 'Food', Amount: 300, Period: 'monthly' }
     ];
-    
+
     AWSMock.mock('DynamoDB.DocumentClient', 'scan', (params, callback) => {
       callback(null, { Items: mockBudgets });
     });
@@ -34,12 +34,13 @@ describe('getAllBudgets', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).length).toBe(2);
   });
 });
-
 
 describe('getBudget', () => {
   it('retrieves a single budget by ID', async () => {
@@ -59,7 +60,9 @@ describe('getBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).Category).toEqual('Housing');
   });
@@ -79,11 +82,12 @@ describe('getBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
   });
 });
-
 
 describe('createBudget', () => {
   it('successfully creates a new budget', async () => {
@@ -101,7 +105,9 @@ describe('createBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(201);
     expect(JSON.parse(result.body).message).toContain('successfully');
   });
@@ -117,11 +123,12 @@ describe('createBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(400);
   });
 });
-
 
 describe('updateBudget', () => {
   it('successfully updates an existing budget', async () => {
@@ -143,7 +150,9 @@ describe('updateBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).message).toContain('successfully');
     expect(JSON.parse(result.body).budget.Amount).toEqual(350);
@@ -165,12 +174,13 @@ describe('updateBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body).message).toEqual('Budget not found');
   });
 });
-
 
 describe('deleteBudget', () => {
   it('successfully deletes a budget', async () => {
@@ -191,7 +201,9 @@ describe('deleteBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).message).toContain('successfully');
   });
@@ -211,9 +223,10 @@ describe('deleteBudget', () => {
       }
     };
 
-    const result = await handler(event);
+    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
+
+    const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body).message).toEqual('Budget not found');
   });
 });
-
