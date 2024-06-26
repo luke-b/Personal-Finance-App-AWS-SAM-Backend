@@ -5,6 +5,8 @@ const { handler } = require('./index');
 // Set AWS SDK instance to mock
 AWSMock.setSDKInstance(AWS);
 
+const context = { awsRequestId: 'mockRequestId' };
+
 beforeEach(() => {
   AWSMock.restore('DynamoDB.DocumentClient'); // Resets DynamoDB mocks
 });
@@ -16,8 +18,8 @@ afterEach(() => {
 describe('getAllBudgets', () => {
   it('retrieves all budgets for a user', async () => {
     const mockBudgets = [
-      { BudgetID: '1', Category: 'Housing', Amount: 1200, Period: 'monthly' },
-      { BudgetID: '2', Category: 'Food', Amount: 300, Period: 'monthly' }
+      { BudgetID: '1', Category: 'Housing', Amount: 1200, Period: 'monthly', UserID: 'user123' },
+      { BudgetID: '2', Category: 'Food', Amount: 300, Period: 'monthly', UserID: 'user123' }
     ];
 
     AWSMock.mock('DynamoDB.DocumentClient', 'scan', (params, callback) => {
@@ -34,8 +36,6 @@ describe('getAllBudgets', () => {
       }
     };
 
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
-
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).length).toBe(2);
@@ -44,7 +44,7 @@ describe('getAllBudgets', () => {
 
 describe('getBudget', () => {
   it('retrieves a single budget by ID', async () => {
-    const mockBudget = { BudgetID: '1', Category: 'Housing', Amount: 1200, Period: 'monthly' };
+    const mockBudget = { BudgetID: '1', Category: 'Housing', Amount: 1200, Period: 'monthly', UserID: 'user123' };
 
     AWSMock.mock('DynamoDB.DocumentClient', 'get', (params, callback) => {
       callback(null, { Item: mockBudget });
@@ -59,8 +59,6 @@ describe('getBudget', () => {
         }
       }
     };
-
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
 
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
@@ -81,8 +79,6 @@ describe('getBudget', () => {
         }
       }
     };
-
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
 
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
@@ -105,8 +101,6 @@ describe('createBudget', () => {
       }
     };
 
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
-
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(201);
     expect(JSON.parse(result.body).message).toContain('successfully');
@@ -122,8 +116,6 @@ describe('createBudget', () => {
         }
       }
     };
-
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
 
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(400);
@@ -150,8 +142,6 @@ describe('updateBudget', () => {
       }
     };
 
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
-
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).message).toContain('successfully');
@@ -173,8 +163,6 @@ describe('updateBudget', () => {
         }
       }
     };
-
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
 
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
@@ -201,8 +189,6 @@ describe('deleteBudget', () => {
       }
     };
 
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
-
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body).message).toContain('successfully');
@@ -223,10 +209,9 @@ describe('deleteBudget', () => {
       }
     };
 
-    const context = { awsRequestId: 'mockRequestId' }; // Add mock context
-
     const result = await handler(event, context); // Pass context to handler
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body).message).toEqual('Budget not found');
   });
 });
+
